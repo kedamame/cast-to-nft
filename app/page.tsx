@@ -8,7 +8,9 @@ import { MintForm } from "@/components/mint-form";
 import { MintButton } from "@/components/mint-button";
 import { WalletButton } from "@/components/wallet-button";
 import { StatusBanner } from "@/components/status-banner";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { useFarcasterMiniApp } from "@/lib/farcaster";
+import { useI18n } from "@/lib/i18n";
 import type { CastRecord, MintDraft } from "@/lib/types";
 import { parseCastUrl } from "@/lib/validations";
 
@@ -18,6 +20,7 @@ export default function HomePage() {
   const { isConnected } = useAccount();
   const { isInMiniApp, isLoading: farcasterLoading, user, castContext } =
     useFarcasterMiniApp();
+  const { t } = useI18n();
 
   const [step, setStep] = useState<Step>("home");
   const [cast, setCast] = useState<CastRecord | null>(null);
@@ -44,7 +47,7 @@ export default function HomePage() {
       setCast(data.cast);
       setStep("preview");
     } catch {
-      setError("Cast が見つかりませんでした。URL を確認してください。");
+      setError(t.castNotFound);
     } finally {
       setLoading(false);
     }
@@ -65,11 +68,12 @@ export default function HomePage() {
       setCast(data.cast);
       setStep("preview");
     } catch {
-      setError("Cast が見つかりませんでした。URL を確認してください。");
+      setError(t.castNotFound);
     } finally {
       setLoading(false);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t]);
 
   const resetAll = () => {
     setStep("home");
@@ -78,11 +82,10 @@ export default function HomePage() {
     setError(null);
   };
 
-  // Farcaster SDK ロード中
   if (farcasterLoading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-400">読み込み中...</div>
+        <div className="text-gray-400">{t.loading}</div>
       </main>
     );
   }
@@ -96,16 +99,15 @@ export default function HomePage() {
             className="text-xl font-bold cursor-pointer"
             onClick={resetAll}
           >
-            Cast-to-NFT
+            {t.castToNft}
           </h1>
           {isInMiniApp && (
             <span className="text-xs px-2 py-0.5 bg-purple-600/30 text-purple-300 rounded-full">
-              MiniApp
+              {t.miniApp}
             </span>
           )}
         </div>
         <div className="flex items-center gap-3">
-          {/* MiniApp 内で Farcaster ユーザー情報を表示 */}
           {isInMiniApp && user && (
             <div className="flex items-center gap-2 text-sm text-gray-300">
               {user.pfpUrl && (
@@ -118,6 +120,7 @@ export default function HomePage() {
               <span>{user.displayName || user.username}</span>
             </div>
           )}
+          <LanguageSwitcher />
           <WalletButton />
         </div>
       </header>
@@ -136,16 +139,15 @@ export default function HomePage() {
           <div className="text-center space-y-8">
             <div>
               <h2 className="text-4xl font-bold mb-4">
-                Cast を NFT にしよう
+                {t.heroTitle}
               </h2>
               <p className="text-gray-400 text-lg max-w-md mx-auto">
-                Farcaster の Cast を Base 上の ERC-1155 NFT として発行できます。
-                著者本人のみがミント可能です。
+                {t.heroDescription}
               </p>
             </div>
 
             {isInMiniApp && loading ? (
-              <div className="text-gray-400">Cast を読み込み中...</div>
+              <div className="text-gray-400">{t.loadingCast}</div>
             ) : (
               <CastUrlForm onSubmit={handleUrlSubmit} loading={loading} />
             )}
@@ -158,14 +160,14 @@ export default function HomePage() {
             {!isConnected && (
               <StatusBanner
                 type="info"
-                message="ウォレットを接続してミントに進みましょう。"
+                message={t.connectWalletPrompt}
               />
             )}
             <CastPreview
               cast={cast}
               onProceed={() => {
                 if (!isConnected) {
-                  setError("ウォレットを接続してください。");
+                  setError(t.connectWalletRequired);
                   return;
                 }
                 setStep("setup");
@@ -199,7 +201,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="text-center py-4 text-sm text-gray-500 border-t border-white/10">
-        Cast-to-NFT — Built on Base
+        {t.builtOnBase}
       </footer>
     </main>
   );

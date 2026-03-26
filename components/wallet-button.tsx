@@ -3,12 +3,14 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { truncateAddress } from "@/lib/utils";
 import { useFarcasterMiniApp } from "@/lib/farcaster";
+import { useI18n } from "@/lib/i18n";
 
 export function WalletButton() {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { isInMiniApp } = useFarcasterMiniApp();
+  const { t } = useI18n();
 
   if (isConnected && address) {
     return (
@@ -20,7 +22,7 @@ export function WalletButton() {
           onClick={() => disconnect()}
           className="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
         >
-          切断
+          {t.disconnect}
         </button>
       </div>
     );
@@ -48,7 +50,7 @@ export function WalletButton() {
           onClick={() => connect({ connector: injectedConnector })}
           className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors"
         >
-          ウォレット接続
+          {t.connectWallet}
         </button>
       );
     }
@@ -58,7 +60,7 @@ export function WalletButton() {
   return (
     <div className="relative group">
       <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
-        ウォレット接続
+        {t.connectWallet}
       </button>
       <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
         {connectors.map((connector) => (

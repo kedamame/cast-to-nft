@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { CastRecord, CardStyle, MintDraft } from "@/lib/types";
 import { StyleSelector } from "./style-selector";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   cast: CastRecord;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export function MintForm({ cast, onConfirm, onBack }: Props) {
+  const { t } = useI18n();
   const [style, setStyle] = useState<CardStyle>("midnight");
   const [includeImage, setIncludeImage] = useState(!!cast.embedImageUrl);
   const [mintPriceEth, setMintPriceEth] = useState("0");
@@ -57,14 +59,14 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6">
       <button onClick={onBack} className="text-sm text-gray-400 hover:text-white">
-        ← 戻る
+        {t.back}
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left: settings */}
         <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium mb-2">スタイル</label>
+            <label className="block text-sm font-medium mb-2">{t.styleLabel}</label>
             <StyleSelector value={style} onChange={setStyle} />
           </div>
 
@@ -76,13 +78,13 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
                 onChange={(e) => setIncludeImage(e.target.checked)}
                 className="rounded"
               />
-              <span className="text-sm">添付画像を含める</span>
+              <span className="text-sm">{t.includeImage}</span>
             </label>
           )}
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              ミント価格 (ETH)
+              {t.mintPriceLabel}
             </label>
             <input
               type="number"
@@ -96,7 +98,7 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              ロイヤリティ ({(royaltyBps / 100).toFixed(1)}%)
+              {t.royaltyLabel((royaltyBps / 100).toFixed(1))}
             </label>
             <input
               type="range"
@@ -111,7 +113,7 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
 
           <div>
             <label className="block text-sm font-medium mb-1">
-              初回ミント枚数
+              {t.initialSupplyLabel}
             </label>
             <input
               type="number"
@@ -130,11 +132,11 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
 
         {/* Right: preview */}
         <div>
-          <label className="block text-sm font-medium mb-2">プレビュー</label>
+          <label className="block text-sm font-medium mb-2">{t.previewLabel}</label>
           <div className="aspect-[1200/630] rounded-lg overflow-hidden bg-white/5 border border-white/10">
             {previewLoading ? (
               <div className="w-full h-full flex items-center justify-center text-gray-400">
-                生成中...
+                {t.generating}
               </div>
             ) : previewUrl ? (
               <img
@@ -144,7 +146,7 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-500">
-                プレビューを読み込めませんでした
+                {t.previewFailed}
               </div>
             )}
           </div>
@@ -155,7 +157,7 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
         onClick={handleSubmit}
         className="w-full py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors"
       >
-        確認画面へ
+        {t.toConfirm}
       </button>
     </div>
   );

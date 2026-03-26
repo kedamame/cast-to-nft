@@ -14,6 +14,7 @@ import { prepareTransaction } from "@/lib/erc8021";
 import type { MintDraft, UploadResult } from "@/lib/types";
 import { StatusBanner } from "./status-banner";
 import { basescanUrl, warpcastComposeUrl } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   draft: MintDraft;
@@ -32,6 +33,7 @@ type MintState =
   | "error";
 
 export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
+  const { t } = useI18n();
   const { address, chainId } = useAccount();
   const { switchChain } = useSwitchChain();
   const { sendTransactionAsync } = useSendTransaction();
@@ -41,10 +43,9 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
   const [txHash, setTxHash] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
 
-  const { isLoading: txPending, isSuccess: txSuccess } =
-    useWaitForTransactionReceipt({
-      hash: txHash as `0x${string}` | undefined,
-    });
+  useWaitForTransactionReceipt({
+    hash: txHash as `0x${string}` | undefined,
+  });
 
   const isWrongNetwork = chainId !== baseSepolia.id;
 
@@ -65,7 +66,7 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
       });
       const verifyData = await verifyRes.json();
       if (!verifyData.verified) {
-        setError("このウォレットは Cast 著者と一致しません。");
+        setError(t.authorMismatch);
         setState("error");
         return;
       }
@@ -83,7 +84,7 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
         }),
       });
       if (!uploadRes.ok) {
-        throw new Error("IPFS への保存に失敗しました。");
+        throw new Error(t.ipfsUploadFailed);
       }
       const upload: UploadResult = await uploadRes.json();
       setUploadResult(upload);
@@ -122,9 +123,9 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
       setState("success");
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "ミントに失敗しました。";
+        err instanceof Error ? err.message : t.mintFailed;
       if (message.includes("User rejected") || message.includes("denied")) {
-        setError("トランザクションがキャンセルされました。");
+        setError(t.transactionCancelled);
       } else {
         setError(message);
       }
@@ -134,12 +135,12 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
 
   // Success view
   if (state === "success" && txHash) {
-    const shareText = `My Cast is now an NFT on Base!\n\n${castUrl}`;
+    const shareText = `${t.shareText}\n\n${castUrl}`;
     return (
       <div className="w-full max-w-xl mx-auto space-y-4">
-        <StatusBanner type="success" message="ミント完了！" />
+        <StatusBanner type="success" message={t.mintComplete} />
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-3">
-          <p className="text-sm text-gray-400">トランザクション Hash</p>
+          <p className="text-sm text-gray-400">{t.transactionHash}</p>
           <p className="font-mono text-sm break-all">{txHash}</p>
 
           <div className="flex flex-col gap-2 pt-4">
@@ -149,7 +150,7 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
               rel="noopener noreferrer"
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-center transition-colors"
             >
-              Basescan で確認
+              {t.viewOnBasescan}
             </a>
             {uploadResult && (
               <p className="text-xs text-gray-400 break-all">
@@ -162,7 +163,7 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
               rel="noopener noreferrer"
               className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-center transition-colors"
             >
-              Warpcast でシェア
+              {t.shareOnWarpcast}
             </a>
           </div>
         </div>
@@ -177,7 +178,7 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
         onClick={onBack}
         className="text-sm text-gray-400 hover:text-white"
       >
-        ← 戻る
+        {t.back}
       </button>
 
       {error && (
@@ -194,43 +195,43 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
       {isWrongNetwork && (
         <StatusBanner
           type="warning"
-          message="Base Sepolia に接続してください。"
+          message={t.connectToBaseSepolia}
         />
       )}
 
       <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
-        <h3 className="text-lg font-bold">ミント内容の確認</h3>
+        <h3 className="text-lg font-bold">{t.confirmTitle}</h3>
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-400">Cast</span>
+            <span className="text-gray-400">{t.castLabel}</span>
             <span className="truncate ml-4">@{castAuthor}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">スタイル</span>
+            <span className="text-gray-400">{t.styleConfirmLabel}</span>
             <span>{draft.style}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">枚数</span>
+            <span className="text-gray-400">{t.quantityLabel}</span>
             <span>{draft.initialSupply}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">ミント価格</span>
+            <span className="text-gray-400">{t.mintPriceConfirmLabel}</span>
             <span>{draft.mintPriceEth} ETH</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">ロイヤリティ</span>
+            <span className="text-gray-400">{t.royaltyConfirmLabel}</span>
             <span>{(draft.royaltyBps / 100).toFixed(1)}%</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">支払い合計</span>
+            <span className="text-gray-400">{t.totalPaymentLabel}</span>
             <span className="font-bold">
               {(Number(draft.mintPriceEth) * draft.initialSupply).toFixed(6)}{" "}
               ETH
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">チェーン</span>
+            <span className="text-gray-400">{t.chainLabel}</span>
             <span>Base Sepolia</span>
           </div>
         </div>
@@ -240,7 +241,7 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
             onClick={() => switchChain({ chainId: baseSepolia.id })}
             className="w-full py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-medium transition-colors"
           >
-            Base Sepolia に切り替え
+            {t.switchToBaseSepolia}
           </button>
         ) : (
           <button
@@ -248,10 +249,10 @@ export function MintButton({ draft, castUrl, castAuthor, onBack }: Props) {
             disabled={state !== "idle" && state !== "error"}
             className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
           >
-            {state === "verifying" && "著者を確認中..."}
-            {state === "uploading" && "IPFS にアップロード中..."}
-            {state === "minting" && "トランザクション送信中..."}
-            {(state === "idle" || state === "error") && "ミント実行"}
+            {state === "verifying" && t.verifyingAuthor}
+            {state === "uploading" && t.uploadingToIpfs}
+            {state === "minting" && t.sendingTransaction}
+            {(state === "idle" || state === "error") && t.executeMint}
           </button>
         )}
       </div>

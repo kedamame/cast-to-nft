@@ -2,6 +2,7 @@
 
 import type { CastRecord } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 type Props = {
   cast: CastRecord;
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export function CastPreview({ cast, onProceed }: Props) {
+  const { t } = useI18n();
+
   return (
     <div className="w-full max-w-xl mx-auto bg-white/5 border border-white/10 rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
@@ -42,13 +45,13 @@ export function CastPreview({ cast, onProceed }: Props) {
           rel="noopener noreferrer"
           className="text-sm text-purple-400 hover:text-purple-300"
         >
-          Warpcast で見る →
+          {t.viewOnWarpcast}
         </a>
         <button
           onClick={onProceed}
           className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors"
         >
-          NFTにする
+          {t.makeNft}
         </button>
       </div>
     </div>

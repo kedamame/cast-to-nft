@@ -8,6 +8,8 @@ import { MintForm } from "@/components/mint-form";
 import { MintButton } from "@/components/mint-button";
 import { WalletButton } from "@/components/wallet-button";
 import { StatusBanner } from "@/components/status-banner";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useI18n } from "@/lib/i18n";
 import type { CastRecord, MintDraft } from "@/lib/types";
 
 type Step = "loading" | "preview" | "setup" | "confirm";
@@ -16,6 +18,7 @@ export default function CastPage() {
   const params = useParams();
   const hash = params.hash as string;
   const { isConnected } = useAccount();
+  const { t } = useI18n();
 
   const [step, setStep] = useState<Step>("loading");
   const [cast, setCast] = useState<CastRecord | null>(null);
@@ -34,25 +37,29 @@ export default function CastPage() {
         setStep("preview");
       })
       .catch(() => {
-        setError("Cast が見つかりませんでした。");
+        setError(t.castNotFound);
         setStep("preview");
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash]);
 
   return (
     <main className="min-h-screen flex flex-col">
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
         <a href="/" className="text-xl font-bold">
-          Cast-to-NFT
+          {t.castToNft}
         </a>
-        <WalletButton />
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <WalletButton />
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         {error && <StatusBanner type="error" message={error} />}
 
         {step === "loading" && (
-          <p className="text-gray-400">読み込み中...</p>
+          <p className="text-gray-400">{t.loading}</p>
         )}
 
         {step === "preview" && cast && (
@@ -60,7 +67,7 @@ export default function CastPage() {
             cast={cast}
             onProceed={() => {
               if (!isConnected) {
-                setError("ウォレットを接続してください。");
+                setError(t.connectWalletRequired);
                 return;
               }
               setStep("setup");
