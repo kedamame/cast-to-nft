@@ -1,0 +1,38 @@
+{
+  "name": "cast-to-nft",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@coinbase/wallet-sdk": "^4.3.7",
+    "@farcaster/frame-sdk": "^0.1.14",
+    "@farcaster/miniapp-sdk": "^0.2.3",
+    "@rainbow-me/rainbowkit": "^2.2.10",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@tanstack/react-query": "^5.94.5",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@walletconnect/ethereum-provider": "^2.23.8",
+    "axios": "^1.13.6",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.1",
+    "next": "^16.2.1",
+    "ox": "^0.14.10",
+    "postcss": "^8.5.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "satori": "^0.26.0",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3",
+    "viem": "^2.47.6",
+    "wagmi": "^2.19.5",
+    "zod": "^4.3.6"
+  }
+}
