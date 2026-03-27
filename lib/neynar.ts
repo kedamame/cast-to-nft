@@ -163,15 +163,18 @@ export async function getCastByHash(
  * Parses username + short hash, resolves FID via Hub API, then scans casts.
  */
 export async function getCastByUrl(url: string): Promise<CastRecord> {
-  const match = url.match(/warpcast\.com\/([^/?#]+)\/(0x[a-fA-F0-9]+)/);
+  // Support various Warpcast URL formats:
+  //   https://warpcast.com/username/0xabc123
+  //   https://warpcast.com/username/abc123  (no 0x prefix)
+  const match = url.match(/warpcast\.com\/([^/?#]+)\/(?:0x)?([a-fA-F0-9]+)/);
   if (!match) {
     throw new Error(
-      "Invalid Warpcast URL. Expected: https://warpcast.com/<username>/<hash>"
+      `Invalid Warpcast URL: "${url}". Expected: https://warpcast.com/<username>/<hash>`
     );
   }
 
   const username = match[1];
-  const shortHash = match[2];
+  const shortHash = `0x${match[2]}`; // Normalize to 0x prefix
 
   // Step 1: Get FID from username
   const fid = await getFidByUsername(username);
