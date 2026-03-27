@@ -32,16 +32,18 @@ export default function HomePage() {
   useEffect(() => {
     if (farcasterLoading) return;
     if (isInMiniApp && castContext?.hash && !cast) {
-      fetchCastByHash(castContext.hash);
+      fetchCastByHash(castContext.hash, castContext.fid);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [farcasterLoading, isInMiniApp, castContext]);
 
-  const fetchCastByHash = async (hash: string) => {
+  const fetchCastByHash = async (hash: string, fid?: number) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cast?hash=${encodeURIComponent(hash)}`);
+      const params = new URLSearchParams({ hash });
+      if (fid) params.set("fid", String(fid));
+      const res = await fetch(`/api/cast?${params}`);
       if (!res.ok) throw new Error();
       const data = await res.json();
       setCast(data.cast);

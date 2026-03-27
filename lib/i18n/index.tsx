@@ -32,9 +32,7 @@ function getInitialLocale(): Locale {
   if (typeof window === "undefined") return "en";
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "en" || stored === "ja") return stored;
-  // Detect browser language
-  const browserLang = navigator.language.slice(0, 2);
-  return browserLang === "ja" ? "ja" : "en";
+  return "en";
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

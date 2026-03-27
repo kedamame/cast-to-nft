@@ -4,21 +4,25 @@ import { getCastByUrl, getCastByHash } from "@/lib/neynar";
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get("url");
   const hash = req.nextUrl.searchParams.get("hash");
+  const fidStr = req.nextUrl.searchParams.get("fid");
+  const fid = fidStr ? Number(fidStr) : undefined;
 
   if (!url && !hash) {
     return NextResponse.json(
-      { error: "url または hash パラメータが必要です" },
+      { error: "url or hash parameter is required" },
       { status: 400 }
     );
   }
 
   try {
-    const cast = hash ? await getCastByHash(hash) : await getCastByUrl(url!);
+    const cast = hash
+      ? await getCastByHash(hash, fid)
+      : await getCastByUrl(url!);
     return NextResponse.json({ cast });
   } catch (err) {
-    console.error("Cast取得エラー:", err);
+    console.error("Cast fetch error:", err);
     return NextResponse.json(
-      { error: "Cast が見つかりませんでした。URL を確認してください。" },
+      { error: "Cast not found. Please check the URL." },
       { status: 404 }
     );
   }
