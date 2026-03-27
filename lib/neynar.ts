@@ -97,7 +97,7 @@ async function findCastByHashPrefix(
   let pageToken = "";
 
   for (let page = 0; page < 10; page++) {
-    const url = `${HUB_API}/castsByFid?fid=${fid}&pageSize=100&reverse=1${
+    const url = `${HUB_API}/castsByFid?fid=${fid}&pageSize=100&reverse=true${
       pageToken ? `&pageToken=${pageToken}` : ""
     }`;
     const res = await fetch(url);
