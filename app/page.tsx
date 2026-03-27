@@ -65,12 +65,15 @@ export default function HomePage() {
         : `hash=${encodeURIComponent(url)}`;
 
       const res = await fetch(`/api/cast?${query}`);
-      if (!res.ok) throw new Error();
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.debug || data?.error || "Unknown error");
+      }
       setCast(data.cast);
       setStep("preview");
-    } catch {
-      setError(t.castNotFound);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      setError(`${t.castNotFound}${msg ? ` (${msg})` : ""}`);
     } finally {
       setLoading(false);
     }

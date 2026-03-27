@@ -20,9 +20,14 @@ export async function GET(req: NextRequest) {
       : await getCastByUrl(url!);
     return NextResponse.json({ cast });
   } catch (err) {
-    console.error("Cast fetch error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Cast fetch error:", message);
     return NextResponse.json(
-      { error: "Cast not found. Please check the URL." },
+      {
+        error: "Cast not found. Please check the URL.",
+        debug: message,
+        params: { url, hash, fid },
+      },
       { status: 404 }
     );
   }
