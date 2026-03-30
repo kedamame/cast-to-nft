@@ -31,6 +31,7 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
           castHash: cast.hash,
           style,
           includeImage,
+          cast,
         }),
       })
         .then((res) => res.blob())

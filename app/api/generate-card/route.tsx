@@ -1,21 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCastByHash } from "@/lib/neynar";
 import { generateCardPng } from "@/lib/card-generator";
-import type { CardStyle } from "@/lib/types";
+import type { CastRecord, CardStyle } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { castHash, style = "midnight", includeImage = false } = body;
+    const {
+      castHash,
+      style = "midnight",
+      includeImage = false,
+      cast: castData,
+    } = body;
 
-    if (!castHash) {
+    // Use provided cast data, or fetch by hash as fallback
+    let cast: CastRecord;
+    if (castData && castData.hash && castData.text !== undefined) {
+      cast = castData as CastRecord;
+    } else if (castHash) {
+      cast = await getCastByHash(castHash);
+    } else {
       return NextResponse.json(
-        { error: "castHash is required" },
+        { error: "castHash or cast data is required" },
         { status: 400 }
       );
     }
 
-    const cast = await getCastByHash(castHash);
     const png = await generateCardPng(
       cast,
       style as CardStyle,
@@ -29,9 +39,9 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err) {
-    console.error("画像生成エラー:", err);
+    console.error("Card generation error:", err);
     return NextResponse.json(
-      { error: "画像生成に失敗しました。もう一度お試しください。" },
+      { error: "Failed to generate card image." },
       { status: 500 }
     );
   }
