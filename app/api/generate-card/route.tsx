@@ -30,14 +30,21 @@ export async function POST(req: NextRequest) {
 
     const element = buildCardElement(cast, style as CardStyle, includeImage);
 
-    return new ImageResponse(element, {
+    // Force full evaluation inside try/catch so satori errors are caught
+    const imageResponse = new ImageResponse(element, {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
     });
+    const arrayBuffer = await imageResponse.arrayBuffer();
+
+    return new NextResponse(arrayBuffer, {
+      headers: { "Content-Type": "image/png" },
+    });
   } catch (err) {
-    console.error("Card generation error:", err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("Card generation error:", message);
     return NextResponse.json(
-      { error: "Failed to generate card image." },
+      { error: `Card generation failed: ${message}` },
       { status: 500 }
     );
   }
