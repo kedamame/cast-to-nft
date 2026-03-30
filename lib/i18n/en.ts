@@ -81,6 +81,15 @@ const en = {
   authorVerifyError: "Failed to verify author.",
   ipfsSaveError: "Failed to save to IPFS.",
 
+  // Connection Status
+  farcasterConnected: "Farcaster: Connected",
+  farcasterNotDetected: "Farcaster: Not detected (open as MiniApp)",
+  walletConnected: "Wallet: Connected",
+  walletNotConnected: "Wallet: Not connected",
+  walletMatchesFarcaster: "Linked to Farcaster",
+  walletNotMatchFarcaster: "Not linked to Farcaster account",
+  cancel: "Cancel",
+
   // Language
   language: "Language",
 };

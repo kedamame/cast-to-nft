@@ -9,6 +9,7 @@ import { MintButton } from "@/components/mint-button";
 import { WalletButton } from "@/components/wallet-button";
 import { StatusBanner } from "@/components/status-banner";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ConnectionStatus } from "@/components/connection-status";
 import { useFarcasterMiniApp } from "@/lib/farcaster";
 import { useI18n } from "@/lib/i18n";
 import type { CastRecord, MintDraft } from "@/lib/types";
@@ -110,6 +111,7 @@ export default function HomePage() {
           <WalletButton />
         </div>
       </header>
+      <ConnectionStatus />
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         {error && (

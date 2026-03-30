@@ -95,7 +95,7 @@ export function WalletButton() {
               onClick={() => setShowModal(false)}
               className="w-full px-4 py-3 text-sm text-gray-400 hover:text-white transition-colors"
             >
-              Cancel
+              {t.cancel}
             </button>
           </div>
         </div>

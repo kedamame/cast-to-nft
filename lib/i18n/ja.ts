@@ -83,6 +83,15 @@ const ja: Translations = {
   authorVerifyError: "著者の確認に失敗しました。",
   ipfsSaveError: "IPFS への保存に失敗しました。",
 
+  // Connection Status
+  farcasterConnected: "Farcaster: 接続済み",
+  farcasterNotDetected: "Farcaster: 未検出（MiniAppで開いてください）",
+  walletConnected: "ウォレット: 接続済み",
+  walletNotConnected: "ウォレット: 未接続",
+  walletMatchesFarcaster: "Farcasterと連携済み",
+  walletNotMatchFarcaster: "Farcasterアカウントと未連携",
+  cancel: "キャンセル",
+
   // Language
   language: "言語",
 };
