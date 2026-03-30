@@ -20,27 +20,38 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
   const [initialSupply, setInitialSupply] = useState(1);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       setPreviewLoading(true);
-      fetch("/api/generate-card", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          castHash: cast.hash,
-          style,
-          includeImage,
-          cast,
-        }),
-      })
-        .then((res) => res.blob())
-        .then((blob) => {
-          if (previewUrl) URL.revokeObjectURL(previewUrl);
-          setPreviewUrl(URL.createObjectURL(blob));
-        })
-        .catch(() => setPreviewUrl(null))
-        .finally(() => setPreviewLoading(false));
+      setPreviewError(null);
+      try {
+        const res = await fetch("/api/generate-card", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            castHash: cast.hash,
+            style,
+            includeImage,
+            cast,
+          }),
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          setPreviewError(`HTTP ${res.status}: ${errText.slice(0, 200)}`);
+          setPreviewUrl(null);
+          return;
+        }
+        const blob = await res.blob();
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(URL.createObjectURL(blob));
+      } catch (e) {
+        setPreviewError(e instanceof Error ? e.message : String(e));
+        setPreviewUrl(null);
+      } finally {
+        setPreviewLoading(false);
+      }
     }, 500);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -145,6 +156,10 @@ export function MintForm({ cast, onConfirm, onBack }: Props) {
                 alt="Card preview"
                 className="w-full h-full object-cover"
               />
+            ) : previewError ? (
+              <div className="w-full h-full flex items-center justify-center p-4 text-red-400 text-xs break-all">
+                {previewError}
+              </div>
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-500">
                 {t.previewFailed}
