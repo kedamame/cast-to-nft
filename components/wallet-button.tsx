@@ -14,6 +14,23 @@ export function WalletButton() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const autoConnectAttempted = useRef(false);
+
+  // MiniApp: auto-connect injected wallet on load
+  useEffect(() => {
+    if (!isInMiniApp || isConnected || autoConnectAttempted.current) return;
+    autoConnectAttempted.current = true;
+
+    // Wait briefly for Farcaster SDK to set window.ethereum
+    const timer = setTimeout(() => {
+      const connector =
+        connectors.find((c) => c.id === "injected") ?? connectors[0];
+      if (connector) {
+        connect({ connector });
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isInMiniApp, isConnected, connectors, connect]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -55,7 +72,7 @@ export function WalletButton() {
     }
   };
 
-  // MiniApp: prefer injected, fallback to first available connector
+  // MiniApp: single button (prefer injected, fallback to first)
   if (isInMiniApp) {
     const connector =
       connectors.find((c) => c.id === "injected") ?? connectors[0];
