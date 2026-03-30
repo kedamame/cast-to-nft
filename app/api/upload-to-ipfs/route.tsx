@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ImageResponse } from "next/og";
 import { uploadBuffer, uploadJson } from "@/lib/pinata";
 import { getCastByHash } from "@/lib/neynar";
-import { generateCardPng } from "@/lib/card-generator";
+import { buildCardElement, CARD_WIDTH, CARD_HEIGHT } from "@/lib/card-element";
 import { uploadSchema } from "@/lib/validations";
 import type { CardStyle } from "@/lib/types";
+
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,12 +16,18 @@ export async function POST(req: NextRequest) {
     // Get cast details
     const cast = await getCastByHash(parsed.castHash);
 
-    // Generate card image directly (no self-fetch)
-    const imageBuffer = await generateCardPng(
+    // Generate card image via ImageResponse → Buffer
+    const element = buildCardElement(
       cast,
       parsed.style as CardStyle,
       parsed.includeImage
     );
+    const imageResponse = new ImageResponse(element, {
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
+    });
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    const imageBuffer = Buffer.from(arrayBuffer);
 
     // Upload image to IPFS
     const imageUri = await uploadBuffer(
