@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { truncateAddress } from "@/lib/utils";
 import { useFarcasterMiniApp } from "@/lib/farcaster";
@@ -11,6 +12,19 @@ export function WalletButton() {
   const { disconnect } = useDisconnect();
   const { isInMiniApp } = useFarcasterMiniApp();
   const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   if (isConnected && address) {
     return (
@@ -41,7 +55,7 @@ export function WalletButton() {
     }
   };
 
-  // MiniApp 内ではinjectedだけ自動接続
+  // MiniApp: single injected wallet button
   if (isInMiniApp) {
     const injectedConnector = connectors.find((c) => c.id === "injected");
     if (injectedConnector) {
@@ -56,23 +70,31 @@ export function WalletButton() {
     }
   }
 
-  // Web ではコネクター一覧を表示
+  // Web: click-to-open dropdown
   return (
-    <div className="relative group">
-      <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors"
+      >
         {t.connectWallet}
       </button>
-      <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-        {connectors.map((connector) => (
-          <button
-            key={connector.uid}
-            onClick={() => connect({ connector })}
-            className="w-full px-4 py-3 text-left text-sm hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg transition-colors"
-          >
-            {getWalletName(connector.id)}
-          </button>
-        ))}
-      </div>
+      {open && (
+        <div className="absolute right-0 top-full mt-2 w-48 bg-gray-900 border border-white/10 rounded-lg shadow-xl z-50">
+          {connectors.map((connector) => (
+            <button
+              key={connector.uid}
+              onClick={() => {
+                connect({ connector });
+                setOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left text-sm hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg transition-colors"
+            >
+              {getWalletName(connector.id)}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
