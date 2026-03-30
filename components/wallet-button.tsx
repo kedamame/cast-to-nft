@@ -55,13 +55,14 @@ export function WalletButton() {
     }
   };
 
-  // MiniApp: single injected wallet button
+  // MiniApp: prefer injected, fallback to first available connector
   if (isInMiniApp) {
-    const injectedConnector = connectors.find((c) => c.id === "injected");
-    if (injectedConnector) {
+    const connector =
+      connectors.find((c) => c.id === "injected") ?? connectors[0];
+    if (connector) {
       return (
         <button
-          onClick={() => connect({ connector: injectedConnector })}
+          onClick={() => connect({ connector })}
           className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors"
         >
           {t.connectWallet}

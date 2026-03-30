@@ -18,7 +18,7 @@ type Step = "home" | "preview" | "setup" | "confirm";
 
 export default function HomePage() {
   const { isConnected } = useAccount();
-  const { isInMiniApp, isLoading: farcasterLoading, user, castContext } =
+  const { isInMiniApp, isLoading: farcasterLoading, castContext } =
     useFarcasterMiniApp();
   const { t } = useI18n();
 
@@ -98,33 +98,14 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <h1
-            className="text-xl font-bold cursor-pointer"
-            onClick={resetAll}
-          >
-            {t.castToNft}
-          </h1>
-          {isInMiniApp && (
-            <span className="text-xs px-2 py-0.5 bg-purple-600/30 text-purple-300 rounded-full">
-              {t.miniApp}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          {isInMiniApp && user && (
-            <div className="flex items-center gap-2 text-sm text-gray-300">
-              {user.pfpUrl && (
-                <img
-                  src={user.pfpUrl}
-                  alt=""
-                  className="w-6 h-6 rounded-full"
-                />
-              )}
-              <span>{user.displayName || user.username}</span>
-            </div>
-          )}
+      <header className="flex items-center justify-between px-4 py-3 border-b border-white/10 gap-2">
+        <h1
+          className="text-lg font-bold cursor-pointer shrink-0"
+          onClick={resetAll}
+        >
+          {t.castToNft}
+        </h1>
+        <div className="flex items-center gap-2 shrink-0">
           <LanguageSwitcher />
           <WalletButton />
         </div>
