@@ -81,7 +81,7 @@ export function buildCardElement(
         )}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 28, fontWeight: 700, color: theme.text }}>
-            @{cast.authorUsername}
+            {`@${cast.authorUsername}`}
           </div>
           <div style={{ fontSize: 18, color: theme.secondary }}>{dateStr}</div>
         </div>
