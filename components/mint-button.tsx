@@ -9,7 +9,7 @@ import {
   useWaitForTransactionReceipt,
   useSwitchChain,
 } from "wagmi";
-import { baseSepolia } from "wagmi/chains";
+import { base } from "wagmi/chains";
 import { parseEther } from "viem";
 import { CAST_NFT_ABI, getContractAddress } from "@/lib/contract";
 import { prepareTransaction } from "@/lib/erc8021";
@@ -68,7 +68,7 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, onBac
       ? isFarcasterWalletActive
       : isConnected && !isFarcasterWalletActive;
 
-  const isWrongNetwork = chainId !== baseSepolia.id;
+  const isWrongNetwork = chainId !== base.id;
 
   const getWalletName = (id: string) => {
     switch (id) {
@@ -253,7 +253,7 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, onBac
           </div>
           <div className="flex justify-between">
             <span className="text-gray-400">{t.chainLabel}</span>
-            <span>Base Sepolia</span>
+            <span>Base</span>
           </div>
         </div>
 
@@ -375,7 +375,7 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, onBac
         {/* Action button */}
         {isWrongNetwork ? (
           <button
-            onClick={() => switchChain({ chainId: baseSepolia.id })}
+            onClick={() => switchChain({ chainId: base.id })}
             className="w-full py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg font-medium transition-colors"
           >
             {t.switchToBaseSepolia}

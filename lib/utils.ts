@@ -20,11 +20,8 @@ export function ethToWei(eth: string): bigint {
   return BigInt(whole) * BigInt(10 ** 18) + BigInt(frac);
 }
 
-export function basescanUrl(txHash: string, testnet = true): string {
-  const base = testnet
-    ? "https://sepolia.basescan.org"
-    : "https://basescan.org";
-  return `${base}/tx/${txHash}`;
+export function basescanUrl(txHash: string): string {
+  return `https://basescan.org/tx/${txHash}`;
 }
 
 export function warpcastComposeUrl(text: string): string {
