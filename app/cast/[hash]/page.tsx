@@ -10,6 +10,7 @@ import { WalletButton } from "@/components/wallet-button";
 import { StatusBanner } from "@/components/status-banner";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useI18n } from "@/lib/i18n";
+import { useFarcasterMiniApp } from "@/lib/farcaster";
 import type { CastRecord, MintDraft } from "@/lib/types";
 
 type Step = "loading" | "preview" | "setup" | "confirm";
@@ -18,6 +19,7 @@ export default function CastPage() {
   const params = useParams();
   const hash = params.hash as string;
   const { isConnected } = useAccount();
+  const { farcasterAddress } = useFarcasterMiniApp();
   const { t } = useI18n();
 
   const [step, setStep] = useState<Step>("loading");
@@ -91,6 +93,7 @@ export default function CastPage() {
             draft={draft}
             castUrl={cast.url}
             castAuthor={cast.authorUsername}
+            farcasterAddress={farcasterAddress}
             onBack={() => setStep("setup")}
           />
         )}
