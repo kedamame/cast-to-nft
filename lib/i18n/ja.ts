@@ -83,6 +83,15 @@ const ja: Translations = {
   authorVerifyError: "著者の確認に失敗しました。",
   ipfsSaveError: "IPFS への保存に失敗しました。",
 
+  // Mint Wallet Selector
+  verificationWalletLabel: "検証用ウォレット（必須）",
+  mintWalletLabel: "ミント用ウォレット",
+  farcasterWalletOption: "Farcasterウォレット",
+  externalWalletOption: "外部EVMウォレット",
+  switchToFarcasterWallet: "Farcasterウォレットに切り替え",
+  connectExternalWallet: "外部ウォレットを接続:",
+  farcasterWalletRequired: "Farcasterウォレットが未検出です。MiniAppとして開いて著者確認を行ってください。",
+
   // Connection Status
   farcasterConnected: "Farcaster: 接続済み",
   farcasterNotDetected: "Farcaster: 未検出（MiniAppで開いてください）",

@@ -81,6 +81,15 @@ const en = {
   authorVerifyError: "Failed to verify author.",
   ipfsSaveError: "Failed to save to IPFS.",
 
+  // Mint Wallet Selector
+  verificationWalletLabel: "Verification Wallet (required)",
+  mintWalletLabel: "Mint Wallet",
+  farcasterWalletOption: "Farcaster Wallet",
+  externalWalletOption: "External EVM Wallet",
+  switchToFarcasterWallet: "Switch to Farcaster Wallet",
+  connectExternalWallet: "Connect an external wallet:",
+  farcasterWalletRequired: "Farcaster wallet not detected. Open this app as a MiniApp to verify authorship.",
+
   // Connection Status
   farcasterConnected: "Farcaster: Connected",
   farcasterNotDetected: "Farcaster: Not detected (open as MiniApp)",
