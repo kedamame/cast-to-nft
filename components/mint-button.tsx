@@ -63,11 +63,18 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farca
     !!address &&
     address.toLowerCase() === farcasterAddress.toLowerCase();
 
-  // 選択されたミント用ウォレットが実際に使える状態か
-  const mintReady =
-    mintWalletType === "farcaster"
-      ? isFarcasterWalletActive
-      : isConnected && !isFarcasterWalletActive;
+  // farcasterAddress がない（ウェブ環境）場合は外部ウォレットに強制フォールバック
+  const effectiveMintWalletType: MintWalletType =
+    mintWalletType === "farcaster" && !farcasterAddress ? "external" : mintWalletType;
+
+  // 外部ウォレットが接続済みか（Farcaster ウォレットとは別の接続）
+  const isExternalWalletConnected =
+    isConnected && (!farcasterAddress || address?.toLowerCase() !== farcasterAddress.toLowerCase());
+
+  // ミント実行可能かどうか
+  const mintReady = farcasterFid !== null
+    ? effectiveMintWalletType === "farcaster" ? isFarcasterWalletActive : isExternalWalletConnected
+    : isConnected; // MiniApp 外: 接続済みウォレットがあれば OK
 
   const isWrongNetwork = chainId !== base.id;
 
@@ -284,31 +291,36 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farca
             )}
           </div>
 
-          {/* Mint wallet selector (only shown when Farcaster is detected) */}
-          {farcasterAddress && (
+          {/* Mint wallet selector (shown when in MiniApp context with a FID) */}
+          {farcasterFid !== null && (
             <div>
               <p className="text-xs text-gray-400 mb-2">{t.mintWalletLabel}</p>
               <div className="space-y-2">
 
                 {/* Option: Farcaster Wallet */}
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className={`flex items-center gap-3 ${farcasterAddress ? "cursor-pointer" : "cursor-not-allowed opacity-50"} group`}>
                   <input
                     type="radio"
                     name="mintWallet"
                     value="farcaster"
-                    checked={mintWalletType === "farcaster"}
+                    checked={effectiveMintWalletType === "farcaster"}
                     onChange={() => setMintWalletType("farcaster")}
+                    disabled={!farcasterAddress}
                     className="accent-purple-500"
                   />
                   <span className="text-sm">
                     {t.farcasterWalletOption}
-                    <span className="ml-2 text-xs text-gray-400">
-                      ({truncateAddress(farcasterAddress)})
-                    </span>
+                    {farcasterAddress ? (
+                      <span className="ml-2 text-xs text-gray-400">
+                        ({truncateAddress(farcasterAddress)})
+                      </span>
+                    ) : (
+                      <span className="ml-2 text-xs text-yellow-500">{t.farcasterWalletRequired}</span>
+                    )}
                   </span>
                 </label>
                 {/* Switch button if Farcaster wallet not active */}
-                {mintWalletType === "farcaster" && !isFarcasterWalletActive && (
+                {effectiveMintWalletType === "farcaster" && farcasterAddress && !isFarcasterWalletActive && (
                   <div className="ml-6">
                     <button
                       onClick={() => {
@@ -328,13 +340,13 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farca
                     type="radio"
                     name="mintWallet"
                     value="external"
-                    checked={mintWalletType === "external"}
+                    checked={effectiveMintWalletType === "external"}
                     onChange={() => setMintWalletType("external")}
                     className="accent-purple-500"
                   />
                   <span className="text-sm">
                     {t.externalWalletOption}
-                    {mintWalletType === "external" && !isFarcasterWalletActive && isConnected && address && (
+                    {effectiveMintWalletType === "external" && isExternalWalletConnected && address && (
                       <span className="ml-2 text-xs text-gray-400">
                         ({truncateAddress(address)})
                       </span>
@@ -342,9 +354,9 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farca
                   </span>
                 </label>
                 {/* Connector picker for external wallet */}
-                {mintWalletType === "external" && (
+                {effectiveMintWalletType === "external" && (
                   <div className="ml-6 space-y-1.5">
-                    {isConnected && !isFarcasterWalletActive ? (
+                    {isExternalWalletConnected ? (
                       <div className="flex items-center gap-2 text-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
                         <span className="text-green-300">{truncateAddress(address!)}</span>
@@ -391,8 +403,7 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farca
             onClick={handleMint}
             disabled={
               (state !== "idle" && state !== "error") ||
-              !isConnected ||
-              (!!farcasterAddress && !mintReady)
+              !mintReady
             }
             className="w-full py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
           >
