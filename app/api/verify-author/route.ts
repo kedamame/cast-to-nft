@@ -7,10 +7,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const parsed = verifyAuthorSchema.parse(body);
 
-    const result = await verifyCastAuthor(
-      parsed.castHash,
-      parsed.walletAddress
-    );
+    const result = await verifyCastAuthor(parsed.castHash, {
+      walletAddress: parsed.walletAddress,
+      fid: parsed.fid,
+    });
 
     return NextResponse.json(result);
   } catch (err) {

@@ -130,33 +130,33 @@ export async function getCastByHash(
 
 export async function verifyCastAuthor(
   castHash: string,
-  walletAddress: string,
-  authorFid?: number
+  opts: { walletAddress?: string; fid?: number; authorFid?: number }
 ): Promise<{
   verified: boolean;
   castAuthorFid: number;
   walletFids: number[];
 }> {
-  // Get the cast to find the author FID
-  const cast = await getCastByHash(castHash, authorFid);
-  const fid = cast.authorFid;
+  const cast = await getCastByHash(castHash, opts.authorFid);
+  const castAuthorFid = cast.authorFid;
 
-  // Try Hub API for verifications (preferred, free)
-  let verifiedAddresses = await getVerificationsByFidFromHub(fid);
-
-  // If Hub API is down, try Warpcast API (ethWallets from user endpoint)
-  if (verifiedAddresses.length === 0) {
-    verifiedAddresses = await getWalletsByFid(fid);
+  // FID verification: MiniApp context provides a trusted FID from the platform
+  if (opts.fid !== undefined) {
+    const verified = opts.fid === castAuthorFid;
+    return { verified, castAuthorFid, walletFids: verified ? [opts.fid] : [] };
   }
 
-  const normalizedWallet = walletAddress.toLowerCase();
-  const verified = verifiedAddresses.includes(normalizedWallet);
+  // Wallet address verification: fallback for browser context
+  if (opts.walletAddress) {
+    let verifiedAddresses = await getVerificationsByFidFromHub(castAuthorFid);
+    if (verifiedAddresses.length === 0) {
+      verifiedAddresses = await getWalletsByFid(castAuthorFid);
+    }
+    const normalizedWallet = opts.walletAddress.toLowerCase();
+    const verified = verifiedAddresses.includes(normalizedWallet);
+    return { verified, castAuthorFid, walletFids: verified ? [castAuthorFid] : [] };
+  }
 
-  return {
-    verified,
-    castAuthorFid: fid,
-    walletFids: verified ? [fid] : [],
-  };
+  return { verified: false, castAuthorFid, walletFids: [] };
 }
 
 // ---------- Wallet verification helpers ----------

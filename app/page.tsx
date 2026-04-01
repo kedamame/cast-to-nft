@@ -19,7 +19,7 @@ type Step = "home" | "preview" | "setup" | "confirm";
 
 export default function HomePage() {
   const { isConnected } = useAccount();
-  const { isInMiniApp, isLoading: farcasterLoading, castContext, farcasterAddress } =
+  const { isInMiniApp, isLoading: farcasterLoading, castContext, farcasterAddress, user: farcasterUser } =
     useFarcasterMiniApp();
   const { t } = useI18n();
 
@@ -183,6 +183,7 @@ export default function HomePage() {
             castUrl={cast.url}
             castAuthor={cast.authorUsername}
             farcasterAddress={farcasterAddress}
+            farcasterFid={farcasterUser?.fid ?? null}
             onBack={() => setStep("setup")}
           />
         )}

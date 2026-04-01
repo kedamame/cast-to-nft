@@ -24,6 +24,7 @@ type Props = {
   castUrl: string;
   castAuthor: string;
   farcasterAddress: string | null;
+  farcasterFid: number | null;
   onBack: () => void;
 };
 
@@ -38,7 +39,7 @@ type MintState =
 
 type MintWalletType = "farcaster" | "external";
 
-export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, onBack }: Props) {
+export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farcasterFid, onBack }: Props) {
   const { t } = useI18n();
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
@@ -85,15 +86,20 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, onBac
     setError(null);
 
     try {
-      // Step 1: 著者確認（常に Farcaster ウォレットで確認）
+      // Step 1: 著者確認
+      // MiniApp context: FID で直接確認（優先）
+      // Browser context: ウォレットアドレスで確認（フォールバック）
       setState("verifying");
+      const verifyBody: Record<string, unknown> = { castHash: draft.castHash };
+      if (farcasterFid !== null) {
+        verifyBody.fid = farcasterFid;
+      } else {
+        verifyBody.walletAddress = verificationAddress;
+      }
       const verifyRes = await fetch("/api/verify-author", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          castHash: draft.castHash,
-          walletAddress: verificationAddress,
-        }),
+        body: JSON.stringify(verifyBody),
       });
       const verifyData = await verifyRes.json();
       if (!verifyData.verified) {

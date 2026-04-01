@@ -19,7 +19,7 @@ export default function CastPage() {
   const params = useParams();
   const hash = params.hash as string;
   const { isConnected } = useAccount();
-  const { farcasterAddress } = useFarcasterMiniApp();
+  const { farcasterAddress, user: farcasterUser } = useFarcasterMiniApp();
   const { t } = useI18n();
 
   const [step, setStep] = useState<Step>("loading");
@@ -94,6 +94,7 @@ export default function CastPage() {
             castUrl={cast.url}
             castAuthor={cast.authorUsername}
             farcasterAddress={farcasterAddress}
+            farcasterFid={farcasterUser?.fid ?? null}
             onBack={() => setStep("setup")}
           />
         )}

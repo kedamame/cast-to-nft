@@ -27,10 +27,18 @@ export const mintDraftSchema = z.object({
   initialSupply: z.number().int().min(1).max(100),
 });
 
-export const verifyAuthorSchema = z.object({
-  castHash: castHashSchema,
-  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "有効なウォレットアドレスではありません"),
-});
+export const verifyAuthorSchema = z
+  .object({
+    castHash: castHashSchema,
+    walletAddress: z
+      .string()
+      .regex(/^0x[a-fA-F0-9]{40}$/, "有効なウォレットアドレスではありません")
+      .optional(),
+    fid: z.number().int().positive().optional(),
+  })
+  .refine((d) => d.walletAddress !== undefined || d.fid !== undefined, {
+    message: "walletAddress または fid が必要です",
+  });
 
 export const uploadSchema = z.object({
   castHash: castHashSchema,
