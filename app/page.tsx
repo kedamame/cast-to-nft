@@ -153,6 +153,7 @@ export default function HomePage() {
             )}
             <CastPreview
               cast={cast}
+              onBack={() => { setCast(null); setStep("home"); }}
               onProceed={() => {
                 if (!isConnected) {
                   setError(t.connectWalletRequired);

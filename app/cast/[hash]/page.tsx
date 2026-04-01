@@ -67,6 +67,7 @@ export default function CastPage() {
         {step === "preview" && cast && (
           <CastPreview
             cast={cast}
+            onBack={() => setStep("preview")}
             onProceed={() => {
               if (!isConnected) {
                 setError(t.connectWalletRequired);

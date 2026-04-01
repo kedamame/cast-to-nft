@@ -7,13 +7,20 @@ import { useI18n } from "@/lib/i18n";
 type Props = {
   cast: CastRecord;
   onProceed: () => void;
+  onBack?: () => void;
 };
 
-export function CastPreview({ cast, onProceed }: Props) {
+export function CastPreview({ cast, onProceed, onBack }: Props) {
   const { t } = useI18n();
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white/5 border border-white/10 rounded-xl p-6">
+    <div className="w-full max-w-xl mx-auto space-y-2">
+      {onBack && (
+        <button onClick={onBack} className="text-sm text-gray-400 hover:text-white">
+          {t.back}
+        </button>
+      )}
+    <div className="bg-white/5 border border-white/10 rounded-xl p-6">
       <div className="flex items-center gap-3 mb-4">
         {cast.authorPfpUrl && (
           <img
@@ -54,6 +61,7 @@ export function CastPreview({ cast, onProceed }: Props) {
           {t.makeNft}
         </button>
       </div>
+    </div>
     </div>
   );
 }
