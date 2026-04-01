@@ -310,15 +310,16 @@ export function MintButton({ draft, castUrl, castAuthor, farcasterAddress, farca
                   />
                   <span className="text-sm">
                     {t.farcasterWalletOption}
-                    {farcasterAddress ? (
+                    {farcasterAddress && (
                       <span className="ml-2 text-xs text-gray-400">
                         ({truncateAddress(farcasterAddress)})
                       </span>
-                    ) : (
-                      <span className="ml-2 text-xs text-yellow-500">{t.farcasterWalletRequired}</span>
                     )}
                   </span>
                 </label>
+                {!farcasterAddress && (
+                  <p className="ml-6 text-xs text-yellow-500">{t.farcasterWalletRequired}</p>
+                )}
                 {/* Switch button if Farcaster wallet not active */}
                 {effectiveMintWalletType === "farcaster" && farcasterAddress && !isFarcasterWalletActive && (
                   <div className="ml-6">

@@ -90,7 +90,7 @@ const ja: Translations = {
   externalWalletOption: "外部EVMウォレット",
   switchToFarcasterWallet: "Farcasterウォレットに切り替え",
   connectExternalWallet: "外部ウォレットを接続:",
-  farcasterWalletRequired: "Farcasterウォレットが未検出です。MiniAppとして開いて著者確認を行ってください。",
+  farcasterWalletRequired: "ウェブ版では使用できません。モバイルアプリから開くとFarcasterウォレットでミントできます。",
 
   // Connection Status
   farcasterConnected: "Farcaster: 接続済み",

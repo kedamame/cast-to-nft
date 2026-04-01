@@ -88,7 +88,7 @@ const en = {
   externalWalletOption: "External EVM Wallet",
   switchToFarcasterWallet: "Switch to Farcaster Wallet",
   connectExternalWallet: "Connect an external wallet:",
-  farcasterWalletRequired: "Farcaster wallet not detected. Open this app as a MiniApp to verify authorship.",
+  farcasterWalletRequired: "Not available in Farcaster web. Use the mobile app to mint with Farcaster Wallet.",
 
   // Connection Status
   farcasterConnected: "Farcaster: Connected",
