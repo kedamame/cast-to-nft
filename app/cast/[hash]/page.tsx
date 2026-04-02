@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { useAccount } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
 import { CastPreview } from "@/components/cast-preview";
 import { MintForm } from "@/components/mint-form";
 import { MintButton } from "@/components/mint-button";
@@ -19,13 +19,25 @@ export default function CastPage() {
   const params = useParams();
   const hash = params.hash as string;
   const { isConnected } = useAccount();
-  const { farcasterAddress, user: farcasterUser } = useFarcasterMiniApp();
+  const { connectors, connect } = useConnect();
+  const { farcasterAddress, user: farcasterUser, isLoading: farcasterLoading } = useFarcasterMiniApp();
+  const autoConnectAttempted = useRef(false);
   const { t } = useI18n();
 
   const [step, setStep] = useState<Step>("loading");
   const [cast, setCast] = useState<CastRecord | null>(null);
   const [draft, setDraft] = useState<MintDraft | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Farcaster ウォレットが利用可能なら wagmi に自動接続
+  useEffect(() => {
+    if (farcasterLoading || !farcasterAddress || isConnected || autoConnectAttempted.current) return;
+    autoConnectAttempted.current = true;
+    const injected = connectors.find((c) => c.id === "injected");
+    if (injected) {
+      connect({ connector: injected });
+    }
+  }, [farcasterLoading, farcasterAddress, isConnected, connectors, connect]);
 
   useEffect(() => {
     if (!hash) return;
@@ -69,7 +81,7 @@ export default function CastPage() {
             cast={cast}
             onBack={() => setStep("preview")}
             onProceed={() => {
-              if (!isConnected) {
+              if (!isConnected && !farcasterAddress) {
                 setError(t.connectWalletRequired);
                 return;
               }

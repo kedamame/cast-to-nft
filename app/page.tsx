@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useAccount } from "wagmi";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useAccount, useConnect } from "wagmi";
 import { CastUrlForm } from "@/components/cast-url-form";
 import { CastPreview } from "@/components/cast-preview";
 import { MintForm } from "@/components/mint-form";
@@ -19,15 +19,27 @@ type Step = "home" | "preview" | "setup" | "confirm";
 
 export default function HomePage() {
   const { isConnected } = useAccount();
+  const { connectors, connect } = useConnect();
   const { isInMiniApp, isLoading: farcasterLoading, castContext, farcasterAddress, user: farcasterUser } =
     useFarcasterMiniApp();
   const { t } = useI18n();
+  const autoConnectAttempted = useRef(false);
 
   const [step, setStep] = useState<Step>("home");
   const [cast, setCast] = useState<CastRecord | null>(null);
   const [draft, setDraft] = useState<MintDraft | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // MiniApp: Farcaster ウォレットが利用可能なら wagmi に自動接続
+  useEffect(() => {
+    if (farcasterLoading || !farcasterAddress || isConnected || autoConnectAttempted.current) return;
+    autoConnectAttempted.current = true;
+    const injected = connectors.find((c) => c.id === "injected");
+    if (injected) {
+      connect({ connector: injected });
+    }
+  }, [farcasterLoading, farcasterAddress, isConnected, connectors, connect]);
 
   // MiniApp: cast embed から起動された場合、自動で Cast を読み込む
   useEffect(() => {
@@ -145,7 +157,7 @@ export default function HomePage() {
         {/* Preview */}
         {step === "preview" && cast && (
           <div className="space-y-4">
-            {!isConnected && (
+            {!isConnected && !farcasterAddress && (
               <StatusBanner
                 type="info"
                 message={t.connectWalletPrompt}
@@ -155,7 +167,7 @@ export default function HomePage() {
               cast={cast}
               onBack={() => { setCast(null); setStep("home"); }}
               onProceed={() => {
-                if (!isConnected) {
+                if (!isConnected && !farcasterAddress) {
                   setError(t.connectWalletRequired);
                   return;
                 }
